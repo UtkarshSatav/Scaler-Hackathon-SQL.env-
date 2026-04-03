@@ -1,0 +1,42 @@
+INFERENCE BASELINE RESULTS
+==========================
+Date: April 3, 2026
+Model: llama-3.3-70b-versatile (via Groq)
+API: https://api.groq.com/openai/v1
+
+[START] task=basic_select env=sql_env model=llama-3.3-70b-versatile
+[STEP] step=1 action=SELECT name, age FROM customers WHERE age > 30 ORDER BY age DESC; reward=1.00 done=false error=null
+[STEP] step=2 action=SELECT name, price FROM products WHERE category = 'Electronics' ORDER BY price DESC; reward=1.00 done=false error=null
+[STEP] step=3 action=SELECT COUNT(id) FROM orders WHERE status = 'shipped' reward=0.10 done=false error=null
+[STEP] step=4 action=SELECT COUNT(id) AS shipped_count FROM orders WHERE status = 'shipped' reward=0.98 done=false error=null
+[STEP] step=5 action=SELECT name, price FROM products ORDER BY price DESC LIMIT 1 reward=1.00 done=false error=null
+[STEP] step=6 action=SELECT name, signup_date FROM customers WHERE city = 'Mumbai' AND signup_date > '2024-01-01' ORDER BY signup_date; reward=1.00 done=true error=null
+[END] success=true steps=6 score=1.000 rewards=1.00,1.00,0.10,0.98,1.00,1.00
+
+[START] task=join_aggregate env=sql_env model=llama-3.3-70b-versatile
+[STEP] step=1 action=SELECT c.name, ROUND(AVG(o.total_amount), 2) AS avg_total FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.name ORDER BY avg_total DESC; reward=1.00 done=false error=null
+[STEP] step=2 action=SELECT p.name, SUM(oi.quantity) AS total_quantity FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.name HAVING SUM(oi.quantity) > 2 ORDER BY total_quantity DESC; reward=0.20 done=false error=null
+[STEP] step=3 action=SELECT p.name, SUM(oi.quantity) AS total_qty FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.name HAVING SUM(oi.quantity) > 2 ORDER BY SUM(oi.quantity) DESC; reward=0.51 done=false error=null
+[STEP] step=4 action=SELECT p.name, SUM(oi.quantity) AS total_qty FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.name HAVING SUM(oi.quantity) > 2 ORDER BY total_qty DESC; reward=0.48 done=false error=null
+[STEP] step=5 action=SELECT p.name, SUM(oi.quantity) AS total_qty FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.name HAVING SUM(oi.quantity) > 2 ORDER BY total_qty DESC; reward=0.47 done=false error=null
+[STEP] step=6 action=SELECT name, email FROM customers WHERE id NOT IN (SELECT customer_id FROM orders) ORDER BY name reward=1.00 done=false error=null
+[STEP] step=7 action=SELECT p.category, ROUND(SUM(oi.quantity * oi.unit_price), 2) AS revenue FROM order_items oi JOIN products p ON oi.product_id = p.id GROUP BY p.category ORDER BY revenue DESC; reward=1.00 done=false error=null
+[STEP] step=8 action=SELECT c.name, SUM(o.total_amount) AS total_spent FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.name ORDER BY total_spent DESC LIMIT 3; reward=1.00 done=true error=null
+[END] success=true steps=8 score=1.000 rewards=1.00,0.20,0.51,0.48,0.47,1.00,1.00,1.00
+
+[START] task=advanced_analytics env=sql_env model=llama-3.3-70b-versatile
+[STEP] step=1 action=SELECT c.name, SUM(o.total_amount) AS total_spent FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.name HAVING SUM(o.total_amount) > (SELECT AVG(total_spent)... reward=1.00 done=false error=null
+[STEP] step=2 action=SELECT p.category, p.name, SUM(oi.quantity * oi.unit_price) AS revenue, DENSE_RANK() OVER (...) AS rank... reward=0.25 done=false error=null
+[STEP] step=3 action=SELECT category, name, revenue, rank FROM (SELECT ...)... reward=0.23 done=false error=null
+[STEP] step=4 action=SELECT category, name, revenue, rank FROM (SELECT ...)... reward=0.21 done=false error=null
+[STEP] step=5 action=SELECT p.category, p.name, SUM(...) AS revenue, DENSE_RANK() OVER (...) AS category_rank... reward=0.94 done=false error=null
+[STEP] step=6 action=SELECT STRFTIME('%Y-%m', order_date) AS month, COUNT(id) AS order_count, COUNT(id) - LAG(...)... reward=0.23 done=false error=null
+[STEP] step=7 action=SELECT STRFTIME('%Y-%m', order_date) AS month, COUNT(id) AS order_count, ... AS growth... reward=0.98 done=false error=null
+[STEP] step=8 action=SELECT c.name, COUNT(DISTINCT p.category) AS category_count... reward=1.00 done=false error=null
+[END] success=true steps=8 score=0.969 rewards=1.00,0.25,0.23,0.21,0.94,0.23,0.98,1.00
+
+SUMMARY
+-------
+basic_select:        score=1.000  (6 steps)
+join_aggregate:      score=1.000  (8 steps)
+advanced_analytics:  score=0.969  (8 steps)

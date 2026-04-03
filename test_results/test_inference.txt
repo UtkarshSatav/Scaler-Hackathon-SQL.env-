@@ -1,0 +1,10 @@
+PASS  test_log_start_format
+PASS  test_log_step_format
+PASS  test_log_step_with_error
+PASS  test_log_end_format
+PASS  test_log_end_failure
+PASS  test_local_run_basic
+PASS  test_inference_all_tasks_locally
+PASS  test_multiline_action_sanitized
+
+8 passed, 0 failed out of 8 tests
