@@ -1,0 +1,93 @@
+{
+  "task_name": "join_aggregate",
+  "difficulty": "medium",
+  "description": "JOIN queries with GROUP BY, HAVING, and aggregate functions",
+  "max_steps_per_question": 4,
+  "questions": [
+    {
+      "id": "med_1",
+      "question": "What is the average order total for each customer? Show customer name and average total (rounded to 2 decimal places), sorted by average total from highest to lowest.",
+      "ground_truth_sql": "SELECT c.name, ROUND(AVG(o.total_amount), 2) as avg_total FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.id ORDER BY avg_total DESC",
+      "expected_columns": ["name", "avg_total"],
+      "expected_row_count": 18,
+      "expected_rows": [
+        ["Swati Tiwari", 3798.0],
+        ["Vikram Singh", 3648.0],
+        ["Pooja Mishra", 3499.0],
+        ["Kavita Joshi", 3248.5],
+        ["Rahul Kumar", 2898.5],
+        ["Divya Saxena", 2598.5],
+        ["Priya Patel", 2548.5],
+        ["Karan Malhotra", 2499.0],
+        ["Aarav Sharma", 1748.5],
+        ["Meera Iyer", 1724.0],
+        ["Suresh Menon", 1648.5],
+        ["Arjun Nair", 1599.0],
+        ["Rohan Das", 1098.5],
+        ["Amit Pandey", 1023.5],
+        ["Ritu Chopra", 999.0],
+        ["Ananya Reddy", 898.0],
+        ["Nikhil Bhat", 849.0],
+        ["Deepak Verma", 848.0]
+      ],
+      "order_matters": true
+    },
+    {
+      "id": "med_2",
+      "question": "Which products have been ordered more than 2 times in total quantity? Show the product name and total quantity ordered, sorted by total quantity from highest to lowest.",
+      "ground_truth_sql": "SELECT p.name, SUM(oi.quantity) as total_qty FROM products p JOIN order_items oi ON p.id = oi.product_id GROUP BY p.id HAVING total_qty > 2 ORDER BY total_qty DESC",
+      "expected_columns": ["name", "total_qty"],
+      "expected_row_count": 8,
+      "expected_rows": [
+        ["Wireless Headphones", 7],
+        ["Ceramic Mug Set", 6],
+        ["Smartphone Case", 5],
+        ["Desk Lamp", 4],
+        ["Python Programming", 4],
+        ["Running Shoes", 4],
+        ["Cotton T-Shirt", 4],
+        ["Cooking Recipes", 3]
+      ],
+      "order_matters": true
+    },
+    {
+      "id": "med_3",
+      "question": "List all customers who have never placed an order. Show their name and email, sorted by name.",
+      "ground_truth_sql": "SELECT name, email FROM customers WHERE id NOT IN (SELECT DISTINCT customer_id FROM orders) ORDER BY name",
+      "expected_columns": ["name", "email"],
+      "expected_row_count": 2,
+      "expected_rows": [
+        ["Nisha Agarwal", "nisha@example.com"],
+        ["Sneha Gupta", "sneha@example.com"]
+      ],
+      "order_matters": true
+    },
+    {
+      "id": "med_4",
+      "question": "What is the total revenue per product category? Calculate revenue as quantity times unit_price from order_items. Show category and revenue (rounded to 2 decimal places), sorted by revenue from highest to lowest.",
+      "ground_truth_sql": "SELECT p.category, ROUND(SUM(oi.quantity * oi.unit_price), 2) as revenue FROM products p JOIN order_items oi ON p.id = oi.product_id GROUP BY p.category ORDER BY revenue DESC",
+      "expected_columns": ["category", "revenue"],
+      "expected_row_count": 4,
+      "expected_rows": [
+        ["Electronics", 28384.0],
+        ["Clothing", 20889.0],
+        ["Home", 10339.0],
+        ["Books", 4989.0]
+      ],
+      "order_matters": true
+    },
+    {
+      "id": "med_5",
+      "question": "Who are the top 3 customers by total spending? Show customer name and total amount spent across all orders, sorted by total spent from highest to lowest.",
+      "ground_truth_sql": "SELECT c.name, SUM(o.total_amount) as total_spent FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.id ORDER BY total_spent DESC LIMIT 3",
+      "expected_columns": ["name", "total_spent"],
+      "expected_row_count": 3,
+      "expected_rows": [
+        ["Vikram Singh", 7296.0],
+        ["Kavita Joshi", 6497.0],
+        ["Rahul Kumar", 5797.0]
+      ],
+      "order_matters": true
+    }
+  ]
+}

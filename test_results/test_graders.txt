@@ -1,0 +1,15 @@
+PASS  test_perfect_match
+PASS  test_syntax_error
+PASS  test_empty_query
+PASS  test_blocked_modification
+PASS  test_wrong_columns
+PASS  test_partial_rows
+PASS  test_extra_rows
+PASS  test_reordered_columns
+PASS  test_null_handling
+PASS  test_float_tolerance
+PASS  test_unordered_match
+PASS  test_reward_bounded
+PASS  test_feedback_present
+
+13 passed, 0 failed out of 13 tests

@@ -1,0 +1,10 @@
+PASS  test_initialize
+PASS  test_select_queries
+PASS  test_join_queries
+PASS  test_window_functions
+PASS  test_block_modifications
+PASS  test_error_handling
+PASS  test_schema_description
+PASS  test_deterministic
+
+8 passed, 0 failed out of 8 tests

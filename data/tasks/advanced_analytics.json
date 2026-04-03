@@ -1,0 +1,101 @@
+{
+  "task_name": "advanced_analytics",
+  "difficulty": "hard",
+  "description": "Subqueries, CTEs, window functions, and complex multi-table analytics",
+  "max_steps_per_question": 5,
+  "questions": [
+    {
+      "id": "hard_1",
+      "question": "Find all customers whose total spending across all orders exceeds the average total spending per customer. Show customer name and total spent, sorted by total spent from highest to lowest.",
+      "ground_truth_sql": "SELECT c.name, SUM(o.total_amount) as total_spent FROM customers c JOIN orders o ON c.id = o.customer_id GROUP BY c.id HAVING total_spent > (SELECT AVG(total_spent) FROM (SELECT SUM(total_amount) as total_spent FROM orders GROUP BY customer_id)) ORDER BY total_spent DESC",
+      "expected_columns": ["name", "total_spent"],
+      "expected_row_count": 9,
+      "expected_rows": [
+        ["Vikram Singh", 7296.0],
+        ["Kavita Joshi", 6497.0],
+        ["Rahul Kumar", 5797.0],
+        ["Divya Saxena", 5197.0],
+        ["Priya Patel", 5097.0],
+        ["Swati Tiwari", 3798.0],
+        ["Pooja Mishra", 3499.0],
+        ["Aarav Sharma", 3497.0],
+        ["Meera Iyer", 3448.0]
+      ],
+      "order_matters": true
+    },
+    {
+      "id": "hard_2",
+      "question": "Rank all products by their total revenue (quantity * unit_price from order_items) within each product category. Show category, product name, revenue, and the rank within the category. Sort by category alphabetically, then by rank.",
+      "ground_truth_sql": "SELECT p.category, p.name, SUM(oi.quantity * oi.unit_price) as revenue, RANK() OVER (PARTITION BY p.category ORDER BY SUM(oi.quantity * oi.unit_price) DESC) as category_rank FROM products p JOIN order_items oi ON p.id = oi.product_id GROUP BY p.id ORDER BY p.category, category_rank",
+      "expected_columns": ["category", "name", "revenue", "category_rank"],
+      "expected_row_count": 15,
+      "expected_rows": [
+        ["Books", "Python Programming", 1796.0, 1],
+        ["Books", "Data Science Handbook", 1398.0, 2],
+        ["Books", "Cooking Recipes", 1197.0, 3],
+        ["Books", "Mystery Novel", 598.0, 4],
+        ["Clothing", "Running Shoes", 11996.0, 1],
+        ["Clothing", "Winter Jacket", 3499.0, 2],
+        ["Clothing", "Denim Jeans", 2998.0, 3],
+        ["Clothing", "Cotton T-Shirt", 2396.0, 4],
+        ["Electronics", "Wireless Headphones", 17493.0, 1],
+        ["Electronics", "Bluetooth Speaker", 7998.0, 2],
+        ["Electronics", "Smartphone Case", 2495.0, 3],
+        ["Electronics", "USB-C Cable", 398.0, 4],
+        ["Home", "Desk Lamp", 5196.0, 1],
+        ["Home", "Ceramic Mug Set", 4794.0, 2],
+        ["Home", "Plant Pot", 349.0, 3]
+      ],
+      "order_matters": true
+    },
+    {
+      "id": "hard_3",
+      "question": "Calculate the month-over-month growth in order count for 2024. Show the month (as YYYY-MM), the number of orders that month, and the change from the previous month (NULL for the first month). Sort by month.",
+      "ground_truth_sql": "SELECT strftime('%Y-%m', order_date) as month, COUNT(*) as order_count, COUNT(*) - LAG(COUNT(*)) OVER (ORDER BY strftime('%Y-%m', order_date)) as growth FROM orders GROUP BY month ORDER BY month",
+      "expected_columns": ["month", "order_count", "growth"],
+      "expected_row_count": 6,
+      "expected_rows": [
+        ["2024-01", 6, null],
+        ["2024-02", 6, 0],
+        ["2024-03", 7, 1],
+        ["2024-04", 4, -3],
+        ["2024-05", 4, 0],
+        ["2024-06", 3, -1]
+      ],
+      "order_matters": true
+    },
+    {
+      "id": "hard_4",
+      "question": "Find all customers who have purchased products from at least 3 different product categories. Show the customer name and the number of distinct categories they bought from, sorted by category count descending then name ascending.",
+      "ground_truth_sql": "SELECT c.name, COUNT(DISTINCT p.category) as category_count FROM customers c JOIN orders o ON c.id = o.customer_id JOIN order_items oi ON o.id = oi.order_id JOIN products p ON oi.product_id = p.id GROUP BY c.id HAVING category_count >= 3 ORDER BY category_count DESC, c.name ASC",
+      "expected_columns": ["name", "category_count"],
+      "expected_row_count": 5,
+      "expected_rows": [
+        ["Rahul Kumar", 4],
+        ["Ananya Reddy", 3],
+        ["Priya Patel", 3],
+        ["Ritu Chopra", 3],
+        ["Rohan Das", 3]
+      ],
+      "order_matters": true
+    },
+    {
+      "id": "hard_5",
+      "question": "For each product category, find the product with the highest average review rating. Show the category, product name, and average rating (rounded to 2 decimal places). Only include products that have at least 2 reviews. Sort by category alphabetically, then by average rating descending.",
+      "ground_truth_sql": "SELECT p.category, p.name, ROUND(AVG(r.rating), 2) as avg_rating FROM products p JOIN reviews r ON p.id = r.product_id GROUP BY p.id HAVING COUNT(r.id) >= 2 ORDER BY p.category, avg_rating DESC",
+      "expected_columns": ["category", "name", "avg_rating"],
+      "expected_row_count": 8,
+      "expected_rows": [
+        ["Books", "Python Programming", 4.5],
+        ["Clothing", "Running Shoes", 4.67],
+        ["Clothing", "Cotton T-Shirt", 3.5],
+        ["Electronics", "Wireless Headphones", 4.67],
+        ["Electronics", "Bluetooth Speaker", 4.5],
+        ["Electronics", "Smartphone Case", 3.5],
+        ["Home", "Ceramic Mug Set", 4.67],
+        ["Home", "Desk Lamp", 4.5]
+      ],
+      "order_matters": true
+    }
+  ]
+}

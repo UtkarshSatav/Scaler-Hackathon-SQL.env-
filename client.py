@@ -1,10 +1,4 @@
-# Copyright (c) Meta Platforms, Inc. and affiliates.
-# All rights reserved.
-#
-# This source code is licensed under the BSD-style license found in the
-# LICENSE file in the root directory of this source tree.
-
-"""Sql Env Environment Client."""
+"""SQL Query Writing Environment Client."""
 
 from typing import Dict
 
@@ -12,71 +6,41 @@ from openenv.core import EnvClient
 from openenv.core.client_types import StepResult
 from openenv.core.env_server.types import State
 
-from .models import SqlAction, SqlObservation
+from .models import SQLAction, SQLObservation
 
 
-class SqlEnv(
-    EnvClient[SqlAction, SqlObservation, State]
+class SQLEnvClient(
+    EnvClient[SQLAction, SQLObservation, State]
 ):
     """
-    Client for the Sql Env Environment.
-
-    This client maintains a persistent WebSocket connection to the environment server,
-    enabling efficient multi-step interactions with lower latency.
-    Each client instance has its own dedicated environment session on the server.
+    Client for the SQL Query Writing Environment.
 
     Example:
-        >>> # Connect to a running server
-        >>> with SqlEnv(base_url="http://localhost:8000") as client:
+        >>> with SQLEnvClient(base_url="http://localhost:8000") as client:
         ...     result = client.reset()
-        ...     print(result.observation.echoed_message)
-        ...
-        ...     result = client.step(SqlAction(message="Hello!"))
-        ...     print(result.observation.echoed_message)
-
-    Example with Docker:
-        >>> # Automatically start container and connect
-        >>> client = SqlEnv.from_docker_image("sql_env-env:latest")
-        >>> try:
-        ...     result = client.reset()
-        ...     result = client.step(SqlAction(message="Test"))
-        ... finally:
-        ...     client.close()
+        ...     print(result.observation.question)
+        ...     result = client.step(SQLAction(query="SELECT * FROM customers"))
+        ...     print(result.observation.query_result)
     """
 
-    def _step_payload(self, action: SqlAction) -> Dict:
-        """
-        Convert SqlAction to JSON payload for step message.
+    def _step_payload(self, action: SQLAction) -> Dict:
+        return {"query": action.query}
 
-        Args:
-            action: SqlAction instance
-
-        Returns:
-            Dictionary representation suitable for JSON encoding
-        """
-        return {
-            "message": action.message,
-        }
-
-    def _parse_result(self, payload: Dict) -> StepResult[SqlObservation]:
-        """
-        Parse server response into StepResult[SqlObservation].
-
-        Args:
-            payload: JSON response data from server
-
-        Returns:
-            StepResult with SqlObservation
-        """
+    def _parse_result(self, payload: Dict) -> StepResult[SQLObservation]:
         obs_data = payload.get("observation", {})
-        observation = SqlObservation(
-            echoed_message=obs_data.get("echoed_message", ""),
-            message_length=obs_data.get("message_length", 0),
+        observation = SQLObservation(
+            task_name=obs_data.get("task_name", ""),
+            question=obs_data.get("question", ""),
+            schema_description=obs_data.get("schema_description", ""),
+            query_result=obs_data.get("query_result", ""),
+            error=obs_data.get("error", ""),
+            steps_remaining=obs_data.get("steps_remaining", 0),
+            question_index=obs_data.get("question_index", 0),
+            total_questions=obs_data.get("total_questions", 0),
             done=payload.get("done", False),
             reward=payload.get("reward"),
             metadata=obs_data.get("metadata", {}),
         )
-
         return StepResult(
             observation=observation,
             reward=payload.get("reward"),
@@ -84,15 +48,6 @@ class SqlEnv(
         )
 
     def _parse_state(self, payload: Dict) -> State:
-        """
-        Parse server response into State object.
-
-        Args:
-            payload: JSON response from state request
-
-        Returns:
-            State object with episode_id and step_count
-        """
         return State(
             episode_id=payload.get("episode_id"),
             step_count=payload.get("step_count", 0),

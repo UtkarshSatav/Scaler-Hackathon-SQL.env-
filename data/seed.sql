@@ -154,7 +154,20 @@ INSERT INTO order_items (id, order_id, product_id, quantity, unit_price) VALUES
 (38, 29, 12, 1,  399.00),
 -- Order 30: customer 20 bought running shoes + mug set
 (39, 30, 7,  1, 2999.00),
-(40, 30, 13, 1,  799.00);
+(40, 30, 13, 1,  799.00),
+-- Extra items to diversify category coverage
+-- Order 3 (customer 2): add a book → Electronics + Clothing + Books
+(41, 3,  9,  1,  449.00),
+-- Order 4 (customer 3): add a t-shirt → Home + Electronics + Clothing
+(42, 4,  5,  1,  599.00),
+-- Order 4 (customer 3): add a book → Home + Electronics + Clothing + Books = 4 categories
+(43, 4,  11, 1,  299.00),
+-- Order 24 (customer 16): add a mug set → Clothing + Books + Home
+(44, 24, 13, 1,  799.00),
+-- Order 9 (customer 6): add a book → Home + Electronics + Books
+(45, 9,  12, 1,  399.00),
+-- Order 17 (customer 11): add headphones → Home + Clothing + Electronics
+(46, 17, 4,  1,  199.00);
 
 -- ============================================================
 -- REVIEWS (25 rows)

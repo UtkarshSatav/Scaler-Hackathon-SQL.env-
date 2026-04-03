@@ -1,0 +1,75 @@
+{
+  "task_name": "basic_select",
+  "difficulty": "easy",
+  "description": "Simple SELECT queries with WHERE, ORDER BY, LIMIT",
+  "max_steps_per_question": 3,
+  "questions": [
+    {
+      "id": "easy_1",
+      "question": "Find the names and ages of all customers older than 30, sorted by age from highest to lowest.",
+      "ground_truth_sql": "SELECT name, age FROM customers WHERE age > 30 ORDER BY age DESC",
+      "expected_columns": ["name", "age"],
+      "expected_row_count": 13,
+      "expected_rows": [
+        ["Suresh Menon", 50],
+        ["Kavita Joshi", 45],
+        ["Swati Tiwari", 44],
+        ["Rahul Kumar", 42],
+        ["Pooja Mishra", 41],
+        ["Divya Saxena", 39],
+        ["Arjun Nair", 38],
+        ["Rohan Das", 36],
+        ["Priya Patel", 35],
+        ["Amit Pandey", 34],
+        ["Deepak Verma", 33],
+        ["Nikhil Bhat", 32],
+        ["Vikram Singh", 31]
+      ],
+      "order_matters": true
+    },
+    {
+      "id": "easy_2",
+      "question": "List all products in the 'Electronics' category, showing name and price, sorted by price from highest to lowest.",
+      "ground_truth_sql": "SELECT name, price FROM products WHERE category = 'Electronics' ORDER BY price DESC",
+      "expected_columns": ["name", "price"],
+      "expected_row_count": 4,
+      "expected_rows": [
+        ["Bluetooth Speaker", 3999.0],
+        ["Wireless Headphones", 2499.0],
+        ["Smartphone Case", 499.0],
+        ["USB-C Cable", 199.0]
+      ],
+      "order_matters": true
+    },
+    {
+      "id": "easy_3",
+      "question": "How many orders have the status 'shipped'?",
+      "ground_truth_sql": "SELECT COUNT(*) as shipped_count FROM orders WHERE status = 'shipped'",
+      "expected_columns": ["shipped_count"],
+      "expected_row_count": 1,
+      "expected_rows": [[5]],
+      "order_matters": false
+    },
+    {
+      "id": "easy_4",
+      "question": "What is the most expensive product? Show its name and price.",
+      "ground_truth_sql": "SELECT name, price FROM products ORDER BY price DESC LIMIT 1",
+      "expected_columns": ["name", "price"],
+      "expected_row_count": 1,
+      "expected_rows": [["Bluetooth Speaker", 3999.0]],
+      "order_matters": false
+    },
+    {
+      "id": "easy_5",
+      "question": "Find all customers from Mumbai who signed up after January 1, 2024. Show their name and signup date, sorted by signup date.",
+      "ground_truth_sql": "SELECT name, signup_date FROM customers WHERE city = 'Mumbai' AND signup_date > '2024-01-01' ORDER BY signup_date",
+      "expected_columns": ["name", "signup_date"],
+      "expected_row_count": 2,
+      "expected_rows": [
+        ["Karan Malhotra", "2024-01-20"],
+        ["Sneha Gupta", "2024-02-14"]
+      ],
+      "order_matters": true
+    }
+  ]
+}

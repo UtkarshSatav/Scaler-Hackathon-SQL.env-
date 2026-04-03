@@ -1,0 +1,51 @@
+TEST RESULTS SUMMARY
+====================
+Date: Fri Apr  3 16:10:44 IST 2026
+Python: 3.11.15
+OpenEnv: 0.2.3
+
+TEST SUITE                PASS  FAIL  TOTAL
+-----------               ----  ----  -----
+test_database                8     0      8
+test_graders                13     0     13
+test_environment            15     0     15
+test_server                  5     0      5
+-----------               ----  ----  -----
+TOTAL                       41     0     41
+
+STATUS: ALL TESTS PASSED
+
+Components Verified:
+  [x] Database initialization (5 tables, correct row counts)
+  [x] SELECT query execution
+  [x] JOIN and aggregate queries
+  [x] Window functions (RANK, LAG)
+  [x] Modification blocking (DELETE, UPDATE, DROP, etc.)
+  [x] Error handling (syntax errors, empty queries, uninitialized DB)
+  [x] Schema description generation
+  [x] Deterministic database state
+  [x] Grader: perfect match → 1.0
+  [x] Grader: syntax error → 0.0
+  [x] Grader: partial rows → proportional credit
+  [x] Grader: wrong columns → 0.1 (syntax only)
+  [x] Grader: reordered columns → 1.0
+  [x] Grader: NULL handling
+  [x] Grader: float tolerance
+  [x] Grader: unordered matching
+  [x] Grader: rewards bounded [0.0, 1.0]
+  [x] Environment: reset returns valid observation
+  [x] Environment: correct query scores 1.0
+  [x] Environment: wrong query gets partial credit
+  [x] Environment: step penalty on retries
+  [x] Environment: max attempts advances question
+  [x] Environment: episode ends after all questions
+  [x] Environment: step after done returns 0.0
+  [x] Environment: all 3 tasks score 5.0 with ground truth
+  [x] Environment: auto-reset on uninitialized step
+  [x] Environment: rewards vary (not constant grader)
+  [x] Server: GET /health → 200
+  [x] Server: POST /reset → 200 with observation
+  [x] Server: POST /step → 200 with graded result
+  [x] Server: GET /state → 200 with episode info
+  [x] Server: GET /schema → 200
+

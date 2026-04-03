@@ -1,0 +1,17 @@
+PASS  test_reset_returns_observation
+PASS  test_step_correct_query
+PASS  test_step_wrong_query
+PASS  test_step_syntax_error
+PASS  test_step_penalty
+PASS  test_max_attempts_advances
+PASS  test_episode_ends
+PASS  test_state_property
+PASS  test_step_after_done
+PASS  test_all_tasks_load
+PASS  test_all_tasks_perfect_score
+PASS  test_auto_reset
+PASS  test_rewards_vary
+PASS  test_medium_task
+PASS  test_hard_task
+
+15 passed, 0 failed out of 15 tests

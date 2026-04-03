@@ -1,0 +1,10 @@
+Starting server...
+Server running on port 8799
+
+PASS  test_health
+PASS  test_reset
+PASS  test_step
+PASS  test_state
+PASS  test_schema
+
+5 passed, 0 failed out of 5 tests
