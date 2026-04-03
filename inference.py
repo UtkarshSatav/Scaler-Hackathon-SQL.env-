@@ -33,15 +33,12 @@ from models import SQLAction
 # ---------------------------------------------------------------------------
 # Configuration
 # ---------------------------------------------------------------------------
-API_KEY = os.getenv("HF_TOKEN") or os.getenv("API_KEY")
-if not API_KEY:
-    try:
-        from huggingface_hub import get_token
-        API_KEY = get_token()
-    except Exception:
-        pass
-API_BASE_URL = os.getenv("API_BASE_URL") or "https://router.huggingface.co/v1"
-MODEL_NAME = os.getenv("MODEL_NAME") or "Qwen/Qwen2.5-72B-Instruct"
+HF_TOKEN = os.getenv("HF_TOKEN")
+API_BASE_URL = os.getenv("API_BASE_URL", "https://router.huggingface.co/v1")
+MODEL_NAME = os.getenv("MODEL_NAME", "Qwen/Qwen2.5-72B-Instruct")
+
+# Also accept API_KEY as fallback for non-HF providers (e.g., Groq)
+API_KEY = HF_TOKEN or os.getenv("API_KEY")
 
 BENCHMARK = "sql_env"
 TASKS = ["basic_select", "join_aggregate", "advanced_analytics"]
