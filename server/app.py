@@ -6,10 +6,8 @@ Endpoints:
     - POST /step: Execute an action (SQL query)
     - GET /state: Get current environment state
     - GET /health: Health check
+    - GET /web: Interactive Gradio playground
     - WS /ws: WebSocket endpoint for persistent sessions
-
-Usage:
-    uvicorn server.app:app --reload --host 0.0.0.0 --port 8000
 """
 
 try:
@@ -36,28 +34,12 @@ app = create_app(
 )
 
 
-from fastapi.responses import HTMLResponse
+# Mount the custom Gradio UI
+import gradio as gr
+from server.gradio_ui import create_gradio_app
 
-
-@app.get("/", response_class=HTMLResponse)
-def root():
-    """Root endpoint — required by HF Spaces to detect the app is running."""
-    return """
-    <html><head><title>SQLEnv - SQL Query Writing Environment</title></head>
-    <body style="font-family:sans-serif;max-width:800px;margin:40px auto;padding:0 20px">
-    <h1>SQLEnv</h1>
-    <p>SQL Query Writing Environment for AI Agents</p>
-    <h3>API Endpoints</h3>
-    <ul>
-        <li><b>POST /reset</b> — Reset environment, get first question</li>
-        <li><b>POST /step</b> — Submit SQL query, get graded result</li>
-        <li><b>GET /state</b> — Current episode state</li>
-        <li><b>GET /health</b> — Health check</li>
-        <li><b>GET /docs</b> — Interactive API docs</li>
-    </ul>
-    <p>3 tasks: basic_select (easy), join_aggregate (medium), advanced_analytics (hard)</p>
-    </body></html>
-    """
+gradio_app = create_gradio_app()
+app = gr.mount_gradio_app(app, gradio_app, path="/")
 
 
 def main(host: str = "0.0.0.0", port: int = 8000):
