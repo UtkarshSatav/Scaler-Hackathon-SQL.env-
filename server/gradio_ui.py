@@ -70,20 +70,18 @@ def create_gradio_app() -> gr.Blocks:
         obs = env.step(SQLAction(query=query))
 
         feedback = obs.metadata.get("feedback", "")
-        reward_display = f"{obs.reward:.3f}"
+        reward_display = round(obs.reward)  # show 0 or 1
 
         # Color the reward
-        if obs.reward >= 0.9:
+        if reward_display == 1:
             reward_html = f'<span style="color:#22c55e;font-size:2em;font-weight:bold">{reward_display}</span>'
-        elif obs.reward >= 0.5:
-            reward_html = f'<span style="color:#eab308;font-size:2em;font-weight:bold">{reward_display}</span>'
         else:
             reward_html = f'<span style="color:#ef4444;font-size:2em;font-weight:bold">{reward_display}</span>'
 
         if obs.done:
             rewards = obs.metadata.get("rewards", [])
             total = obs.metadata.get("total_reward", sum(rewards))
-            status = f"**Episode Complete!**  |  **Total Reward:** {total:.3f}  |  **Steps:** {len(rewards)}"
+            status = f"**Episode Complete!**  |  **Total Reward:** {round(total)}  |  **Steps:** {len(rewards)}"
             next_question = "All questions answered! Click 'Start Task' to try again."
             progress = _build_progress_html(len(rewards), obs.total_questions, rewards)
         else:
@@ -116,10 +114,10 @@ def create_gradio_app() -> gr.Blocks:
         results = []
         for q in task["questions"]:
             obs = env.step(SQLAction(query=q["ground_truth_sql"]))
-            results.append(f"**Q{len(results)+1}:** {q['question'][:80]}...\n- SQL: `{q['ground_truth_sql'][:100]}...`\n- Reward: **{obs.reward:.3f}**\n")
+            results.append(f"**Q{len(results)+1}:** {q['question'][:80]}...\n- SQL: `{q['ground_truth_sql'][:100]}...`\n- Reward: **{round(obs.reward)}**\n")
 
         total = sum(env._rewards)
-        results.append(f"\n---\n**Total: {total:.3f} / {len(task['questions']):.1f}**")
+        results.append(f"\n---\n**Total: {round(total)} / {len(task['questions'])}**")
         return "\n".join(results)
 
     def preview_schema():
@@ -142,7 +140,7 @@ def create_gradio_app() -> gr.Blocks:
                     color = "#eab308"
                 else:
                     color = "#ef4444"
-                bars.append(f'<div style="display:inline-block;width:18%;height:30px;background:{color};margin:1%;border-radius:4px;text-align:center;line-height:30px;color:white;font-weight:bold">Q{i+1}: {r:.3f}</div>')
+                bars.append(f'<div style="display:inline-block;width:18%;height:30px;background:{color};margin:1%;border-radius:4px;text-align:center;line-height:30px;color:white;font-weight:bold">Q{i+1}: {round(r)}</div>')
             elif i == len(rewards):
                 bars.append(f'<div style="display:inline-block;width:18%;height:30px;background:#3b82f6;margin:1%;border-radius:4px;text-align:center;line-height:30px;color:white;font-weight:bold">Q{i+1} ▶</div>')
             else:
