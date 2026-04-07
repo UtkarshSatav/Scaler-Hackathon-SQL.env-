@@ -20,7 +20,7 @@ except ImportError:
     from models import SQLAction, SQLObservation
 
 from .database import Database
-from .graders import grade_query
+from .graders import grade_query, _clamp_reward
 
 TASKS_DIR = Path(__file__).resolve().parent.parent / "data" / "tasks"
 
@@ -92,7 +92,7 @@ class SQLEnvironment(Environment):
         self._schema_cache = self._db.get_schema_description()
 
         return self._make_observation(
-            reward=0.0,
+            reward=_clamp_reward(0.0),
             query_result="",
             error="",
         )
@@ -108,7 +108,7 @@ class SQLEnvironment(Environment):
         if self._done or self._current_q_index >= len(self._questions):
             self._done = True
             return self._make_observation(
-                reward=0.0,
+                reward=_clamp_reward(0.0),
                 query_result="Episode is over. Call reset() to start a new episode.",
                 error="",
             )
@@ -133,7 +133,7 @@ class SQLEnvironment(Environment):
 
         # Apply step penalty (not on first attempt)
         penalty = STEP_PENALTY * (self._q_steps_used - 1)
-        reward = max(raw_reward - penalty, 0.0)
+        reward = _clamp_reward(raw_reward - penalty)
         reward = round(reward, 4)
 
         self._rewards.append(reward)

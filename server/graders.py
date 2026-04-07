@@ -7,12 +7,20 @@ Scores agent queries against ground truth with partial credit:
   - row_score     (0.3): Fraction of expected rows matching
   - exact_score   (0.4): Full result set matches ground truth exactly
 
-Total reward per question is in [0.0, 1.0].
+Total reward per question is in (0.0, 1.0) — strictly between 0 and 1.
 """
 
 from typing import Any, List, Optional, Tuple
 
 from .database import Database, QueryResult
+
+# Epsilon to ensure scores are strictly between 0 and 1 (never exactly 0.0 or 1.0)
+_EPS = 0.001
+
+
+def _clamp_reward(reward: float) -> float:
+    """Clamp reward to be strictly within (0, 1)."""
+    return min(max(reward, _EPS), 1.0 - _EPS)
 
 
 def _normalize_value(val: Any) -> Any:
@@ -76,7 +84,7 @@ def grade_query(
     # --- Syntax Score ---
     if not result.success:
         return {
-            "reward": 0.0,
+            "reward": _clamp_reward(0.0),
             "syntax_score": 0.0,
             "column_score": 0.0,
             "row_score": 0.0,
@@ -145,7 +153,7 @@ def grade_query(
         + W_ROW * row_score
         + W_EXACT * exact_score
     )
-    reward = round(min(max(reward, 0.0), 1.0), 4)
+    reward = round(_clamp_reward(reward), 4)
 
     # --- Feedback ---
     feedback_parts = []

@@ -16,7 +16,7 @@ def _db():
 
 
 def test_perfect_match():
-    """Ground truth SQL scores exactly 1.0."""
+    """Ground truth SQL scores near 1.0 (clamped to 0.999)."""
     db = _db()
     r = grade_query(
         db,
@@ -29,33 +29,33 @@ def test_perfect_match():
          ["Vikram Singh", 31]],
         order_matters=True,
     )
-    assert r["reward"] == 1.0
+    assert r["reward"] == 0.999
     assert r["exact_score"] == 1.0
     db.close()
 
 
 def test_syntax_error():
-    """Invalid SQL scores 0.0."""
+    """Invalid SQL scores 0.001 (clamped from 0.0)."""
     db = _db()
     r = grade_query(db, "SELEC * FORM customers", ["name"], [["x"]], True)
-    assert r["reward"] == 0.0
+    assert r["reward"] == 0.001
     assert r["syntax_score"] == 0.0
     db.close()
 
 
 def test_empty_query():
-    """Empty query scores 0.0."""
+    """Empty query scores 0.001 (clamped from 0.0)."""
     db = _db()
     r = grade_query(db, "", ["name"], [["x"]], True)
-    assert r["reward"] == 0.0
+    assert r["reward"] == 0.001
     db.close()
 
 
 def test_blocked_modification():
-    """Modification attempts score 0.0."""
+    """Modification attempts score 0.001 (clamped from 0.0)."""
     db = _db()
     r = grade_query(db, "DELETE FROM customers", ["name"], [["x"]], True)
-    assert r["reward"] == 0.0
+    assert r["reward"] == 0.001
     db.close()
 
 
@@ -68,7 +68,7 @@ def test_wrong_columns():
     )
     assert r["syntax_score"] == 1.0
     assert r["column_score"] == 0.0
-    assert r["reward"] == 0.1
+    assert r["reward"] == 0.1  # 0.1 is already strictly between 0 and 1
     db.close()
 
 
@@ -108,7 +108,7 @@ def test_extra_rows():
 
 
 def test_reordered_columns():
-    """Query with swapped column order still scores 1.0."""
+    """Query with swapped column order still scores 0.999."""
     db = _db()
     r = grade_query(
         db, "SELECT age, name FROM customers WHERE age = 50",
@@ -116,7 +116,7 @@ def test_reordered_columns():
         [["Suresh Menon", 50]],
         order_matters=False,
     )
-    assert r["reward"] == 1.0
+    assert r["reward"] == 0.999
     db.close()
 
 
@@ -133,7 +133,7 @@ def test_null_handling():
          ["2024-04", 4, -3], ["2024-05", 4, 0], ["2024-06", 3, -1]],
         order_matters=True,
     )
-    assert r["reward"] == 1.0
+    assert r["reward"] == 0.999
     db.close()
 
 
@@ -148,7 +148,7 @@ def test_float_tolerance():
         [[4.24]],
         order_matters=False,
     )
-    assert r["reward"] == 1.0
+    assert r["reward"] == 0.999
     db.close()
 
 
@@ -168,7 +168,7 @@ def test_unordered_match():
 
 
 def test_reward_bounded():
-    """Reward is always in [0.0, 1.0]."""
+    """Reward is always strictly in (0.0, 1.0)."""
     db = _db()
     for sql in [
         "SELECT 1",
@@ -178,7 +178,7 @@ def test_reward_bounded():
         "DELETE FROM customers",
     ]:
         r = grade_query(db, sql, ["name"], [["x"]], True)
-        assert 0.0 <= r["reward"] <= 1.0, f"Reward out of bounds: {r['reward']} for: {sql}"
+        assert 0.0 < r["reward"] < 1.0, f"Reward out of bounds: {r['reward']} for: {sql}"
     db.close()
 
 
